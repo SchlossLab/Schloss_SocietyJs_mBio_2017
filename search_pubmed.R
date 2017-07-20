@@ -34,7 +34,6 @@ flatten_list_items <- function(x){
 		journal <- x$MedlineCitation$Article$Journal$Title
 		pmid <- x$MedlineCitation$PMID$text
 	}
-	print(length(	c(pmid, year, journal)))
 	c(pmid, year, journal)
 }
 
