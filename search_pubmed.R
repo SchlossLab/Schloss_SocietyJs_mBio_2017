@@ -60,7 +60,7 @@ retrieve_records <- function(){
 		query_start <- 1
 	}
 
-	if(!file.exists("search_history.txt"){
+	if(!file.exists("search_history.txt")){
 		search()
 	}
 	cached_history <- scan(file="search_history.txt", what=character(), quiet=T)
@@ -94,6 +94,7 @@ clean_up <- function(){
 	colnames(final_data) <- c("pmid", "doi", "year", "journal")
 
 	final_data$year <- gsub(".*(\\d{4}).*", "\\1", final_data$year)
+	final_data$doi[!grepl("doi:", final_data$doi)] <- "NA"
 	final_data$doi <- gsub(".*doi: (\\S*).*", "\\1", final_data$doi)
 
 	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=F, sep='\t')
