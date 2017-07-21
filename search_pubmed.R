@@ -58,6 +58,9 @@ retrieve_records <- function(){
 	} else {
 		composite <- NULL
 		query_start <- 1
+	}
+
+	if(!file.exists("search_history.txt"){
 		search()
 	}
 	cached_history <- scan(file="search_history.txt", what=character(), quiet=T)
