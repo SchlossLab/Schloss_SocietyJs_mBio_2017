@@ -25,9 +25,9 @@ library("rentrez")
 library(XML)
 
 flatten_list_items <- function(x){
-	year <- x$PubDate
-	journal <- x$FullJournalName
-	doi <- x$ELocationID
+	year <- x$pubdate
+	journal <- x$fulljournalname
+	doi <- x$articleids[which(x$articleids$idtype=='doi'), 'value']
 
 	if(is.null(doi)){ doi <- "NA" }
 	if(is.null(year)){ year <- "NA" }
@@ -77,8 +77,8 @@ retrieve_records <- function(){
 		chunk_summary <- entrez_summary(db="pubmed", web_history=web_history, retmax=chunk_size,
 				retstart=chunk_start, retmode="xml")
 
-		chunk_list <- extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
-				"ELocationID"), simplify=FALSE)
+		chunk_list <- extract_from_esummary(chunk_summary, c("pubdate", "fulljournalname",
+				"articleids"), simplify=FALSE)
 
 		chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
 
