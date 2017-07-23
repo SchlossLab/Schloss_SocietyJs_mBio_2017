@@ -25,11 +25,12 @@ library("rentrez")
 library(XML)
 
 flatten_list_items <- function(x){
-	year <- x$pubdate
-	journal <- x$fulljournalname
-	doi <- x$articleids[which(x$articleids$idtype=='doi'), 'value']
+	year <- x$PubDate
+	journal <- x$FullJournalName
+	id_table <- do.call(rbind.data.frame, x$ArticleIds)
+	doi <- as.character(id_table[which(id_table[,'IdType']=='doi'),'Value'][1])
 
-	if(is.null(doi)){ doi <- "NA" }
+	if(is.null(doi) || is.na(doi)){ doi <- "NA" }
 	if(is.null(year)){ year <- "NA" }
 	if(is.null(journal)){ journal <- "NA" }
 
@@ -77,8 +78,8 @@ retrieve_records <- function(){
 		chunk_summary <- entrez_summary(db="pubmed", web_history=web_history, retmax=chunk_size,
 				retstart=chunk_start, retmode="xml")
 
-		chunk_list <- extract_from_esummary(chunk_summary, c("pubdate", "fulljournalname",
-				"articleids"), simplify=FALSE)
+		chunk_list <- extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
+				"ArticleIds"), simplify=FALSE)
 
 		chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
 
@@ -94,7 +95,6 @@ clean_up <- function(){
 	colnames(final_data) <- c("pmid", "doi", "year", "journal")
 
 	final_data$year <- gsub(".*(\\d{4}).*", "\\1", final_data$year)
-	final_data$doi[!grepl("doi:", final_data$doi)] <- "NA"
 	final_data$doi <- gsub(".*doi: (\\S*).*", "\\1", final_data$doi)
 
 	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=F, sep='\t')
