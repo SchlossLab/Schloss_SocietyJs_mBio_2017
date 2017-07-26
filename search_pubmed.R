@@ -34,7 +34,7 @@ flatten_list_items <- function(x){
 	if(is.null(year)){ year <- "NA" }
 	if(is.null(journal)){ journal <- "NA" }
 
-	c(doi, year, journal)
+	c(doi=doi, year=year, journal=journal)
 }
 
 search <- function(){
@@ -54,7 +54,7 @@ search <- function(){
 
 retrieve_records <- function(){
 	if(file.exists("temp_pmid_doi_year_journal.tsv")){
-		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t')
+		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t', header=T)
 		query_start <- nrow(composite)+1
 	} else {
 		composite <- NULL
@@ -82,11 +82,11 @@ retrieve_records <- function(){
 				"ArticleIds"), simplify=FALSE)
 
 		chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
-		chunk_df[,4] <- rownames(chunk_df)
+		chunk_df$pmid <- rownames(chunk_df)
 
 		composite <- rbind(composite, chunk_df)
 		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=F, row.names=F,
-				col.names=F, sep='\t')
+				col.names=T, sep='\t')
 	}
 }
 
