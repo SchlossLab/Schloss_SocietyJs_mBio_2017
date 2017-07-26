@@ -70,7 +70,7 @@ retrieve_records <- function(){
 	web_history$WebEnv <- cached_history[1]
 	web_history$QueryKey <- cached_history[2]
 
-	chunk_size <- 100
+	chunk_size <- 10000
 	# total_records <- 1000
 
 	for(chunk_start in seq(query_start, total_records, chunk_size)){
