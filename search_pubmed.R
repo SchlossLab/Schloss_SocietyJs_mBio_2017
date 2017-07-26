@@ -53,8 +53,8 @@ search <- function(){
 }
 
 retrieve_records <- function(){
-	if(file.exists("temp_pmid_year_journal.tsv")){
-		composite <- read.table(file="temp_pmid_year_journal.tsv", sep='\t')
+	if(file.exists("temp_pmid_doi_year_journal.tsv")){
+		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t')
 		query_start <- nrow(composite)+1
 	} else {
 		composite <- NULL
@@ -70,7 +70,7 @@ retrieve_records <- function(){
 	web_history$WebEnv <- cached_history[1]
 	web_history$QueryKey <- cached_history[2]
 
-	chunk_size <- 10000
+	chunk_size <- 100
 	# total_records <- 1000
 
 	for(chunk_start in seq(query_start, total_records, chunk_size)){
