@@ -82,9 +82,10 @@ retrieve_records <- function(){
 				"ArticleIds"), simplify=FALSE)
 
 		chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
+		chunk_df[,4] <- rownames(chunk_df)
 
 		composite <- rbind(composite, chunk_df)
-		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=F, row.names=T,
+		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=F, row.names=F,
 				col.names=F, sep='\t')
 	}
 }
