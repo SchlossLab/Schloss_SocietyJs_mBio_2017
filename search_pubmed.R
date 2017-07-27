@@ -54,7 +54,7 @@ search <- function(){
 
 retrieve_records <- function(){
 	if(file.exists("temp_pmid_doi_year_journal.tsv")){
-		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t', header=T)
+		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t', header=T, comment.char="", stringsAsFactors=F)
 		query_start <- nrow(composite)+1
 	} else {
 		composite <- NULL
@@ -85,7 +85,7 @@ retrieve_records <- function(){
 		chunk_df$pmid <- rownames(chunk_df)
 
 		composite <- rbind(composite, chunk_df)
-		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=F, row.names=F,
+		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=T, row.names=F,
 				col.names=T, sep='\t')
 	}
 }
@@ -98,7 +98,7 @@ clean_up <- function(){
 	final_data$year <- gsub(".*(\\d{4}).*", "\\1", final_data$year)
 	final_data$doi <- gsub(".*doi: (\\S*).*", "\\1", final_data$doi)
 
-	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=F, sep='\t')
+	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=T, sep='\t')
 	unlink("temp_pmid_year_journal.tsv")
 	unlink("search_history.txt")
 }
