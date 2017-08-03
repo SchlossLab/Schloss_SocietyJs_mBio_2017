@@ -66,11 +66,7 @@ retrieve_records <- function(){
 	load("r_search.rdata")
 
 	total_records <- r_search$count
-#	web_history$WebEnv <- cached_history[1]
-# web_history$QueryKey <- cached_history[2]
-
-	chunk_size <- 100
-	# total_records <- 1000
+	chunk_size <- 10000
 
 	for(chunk_start in seq(query_start, total_records, chunk_size)){
 		print(chunk_start)
