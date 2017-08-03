@@ -46,10 +46,7 @@ search <- function(){
 	search_string <- paste(paste0(terms, "[All Fields]"), collapse= " OR ")
 	r_search <- entrez_search(db="pubmed", term=search_string, use_history=TRUE)
 
-	webenv <- r_search$web_history$WebEnv
-	querykey <- r_search$web_history$QueryKey
-	hits <- r_search$count
-	write(c(webenv, querykey, hits), "search_history.txt")
+	save(r_search, file="r_search.rdata")
 }
 
 retrieve_records <- function(){
@@ -61,22 +58,24 @@ retrieve_records <- function(){
 		query_start <- 1
 	}
 
-	if(!file.exists("search_history.txt")){
+	if(!file.exists("r_search.rdata")){
 		search()
+		composite <- NULL
+		query_start <- 1
 	}
-	cached_history <- scan(file="search_history.txt", what=character(), quiet=T)
-	total_records <- as.numeric(cached_history[3])
-	web_history <- list()
-	web_history$WebEnv <- cached_history[1]
-	web_history$QueryKey <- cached_history[2]
+	load("r_search.rdata")
 
-	chunk_size <- 10000
+	total_records <- r_search$count
+#	web_history$WebEnv <- cached_history[1]
+# web_history$QueryKey <- cached_history[2]
+
+	chunk_size <- 100
 	# total_records <- 1000
 
 	for(chunk_start in seq(query_start, total_records, chunk_size)){
 		print(chunk_start)
-		chunk_summary <- entrez_summary(db="pubmed", web_history=web_history, retmax=chunk_size,
-				retstart=chunk_start, retmode="xml")
+		chunk_summary <- entrez_summary(db="pubmed", web_history=r_search$web_history,
+																		retmax=chunk_size, retstart=chunk_start, retmode="xml")
 
 		chunk_list <- extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
 				"ArticleIds"), simplify=FALSE)
