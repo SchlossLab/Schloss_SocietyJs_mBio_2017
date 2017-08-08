@@ -23,6 +23,9 @@
 #devtools::install_github("ropensci/rentrez")
 library("rentrez")
 library(XML)
+library(parallel)
+
+
 
 flatten_list_items <- function(x){
 	year <- x$PubDate
@@ -37,6 +40,8 @@ flatten_list_items <- function(x){
 	c(doi=doi, year=year, journal=journal)
 }
 
+
+
 search <- function(){
 	terms <- c("yeast*",  "fung*",  "viral*",  "virus*",  "phage*",  "bacteriophage*",  "archaea*",
 	 					"bacteri*",  "bacteria*",  "bacterio*",  "bacterior*",  "bacterios*",  "bacteriot*",
@@ -49,51 +54,47 @@ search <- function(){
 	save(r_search, file="r_search.rdata")
 }
 
-retrieve_records <- function(){
-	if(file.exists("temp_pmid_doi_year_journal.tsv")){
-		composite <- read.table(file="temp_pmid_doi_year_journal.tsv", sep='\t', header=T, comment.char="", stringsAsFactors=F)
-		query_start <- nrow(composite)+1
-	} else {
-		composite <- NULL
-		query_start <- 1
-	}
 
+
+retrieve_record_chunk <- function(chunk_start, chunk_size=10000){
+
+	load("r_search.rdata")
+
+	print(chunk_start)
+	chunk_summary <- rentrez::entrez_summary(db="pubmed", web_history=r_search$web_history,
+																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
+
+	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
+			"ArticleIds"), simplify=FALSE)
+
+	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
+	chunk_df$pmid <- rownames(chunk_df)
+
+	write.table(file=paste0("temp_pmid_doi_year_journal_", chunk_start, ".tsv"), x=chunk_df,
+		quote=T, row.names=F,col.names=T, sep='\t')
+}
+
+
+
+retrieve_records <- function(){
 	if(!file.exists("r_search.rdata")){
 		search()
-		composite <- NULL
-		query_start <- 1
 	}
 	load("r_search.rdata")
 
-	total_records <- r_search$count
-	chunk_size <- 10000
+	indices <- seq(1, r_search$count, 10000)
 
-	for(chunk_start in seq(query_start, total_records, chunk_size)){
-		print(chunk_start)
-		chunk_summary <- entrez_summary(db="pubmed", web_history=r_search$web_history,
-																		retmax=chunk_size, retstart=chunk_start, retmode="xml")
+	cl <- makeCluster(12)
+	clusterExport(cl, "flatten_list_items")
+	parLapply(cl, indices, retrieve_record_chunk)
+	stopCluster(cl)
 
-		chunk_list <- extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
-				"ArticleIds"), simplify=FALSE)
-
-		chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
-		chunk_df$pmid <- rownames(chunk_df)
-
-		composite <- rbind(composite, chunk_df)
-		write.table(file="temp_pmid_doi_year_journal.tsv", x=composite, quote=T, row.names=F,
-				col.names=T, sep='\t')
-	}
-}
-
-clean_up <- function(){
-	final_data <- read.table(file="temp_pmid_doi_year_journal.tsv", header=F, sep='\t')
-	final_data <- final_data[!is.na(final_data[,1]),]
-	colnames(final_data) <- c("pmid", "doi", "year", "journal")
-
-	final_data$year <- gsub(".*(\\d{4}).*", "\\1", final_data$year)
-	final_data$doi <- gsub(".*doi: (\\S*).*", "\\1", final_data$doi)
+	temp_files <- paste0("temp_pmid_doi_year_journal_", indices, ".tsv")
+	composite <- lapply(temp_files[1:10], function(x)read.table(file=x, stringsAsFactors=F, header=T))
+	composite <- do.call(rbind.data.frame, composite)
 
 	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=T, sep='\t')
+
 	unlink("temp_pmid_year_journal.tsv")
-	unlink("search_history.txt")
+	unlink("r_search.rdata")
 }
