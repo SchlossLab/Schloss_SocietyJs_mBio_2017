@@ -96,6 +96,6 @@ retrieve_records <- function(){
 
 	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=T, sep='\t')
 
-	unlink("temp_pmid_year_journal.tsv")
+	unlink(temp_files)
 	unlink("r_search.rdata")
 }
