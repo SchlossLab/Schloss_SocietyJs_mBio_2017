@@ -60,7 +60,7 @@ retrieve_record_chunk <- function(chunk_start, chunk_size=10000){
 
 	load("r_search.rdata")
 
-	Sys.sleep(runif(1) * 50) # slow down searches so they don't clobber server
+	Sys.sleep(runif(1) * 5) # slow down searches so they don't clobber server
 
 	chunk_summary <- rentrez::entrez_summary(db="pubmed", web_history=r_search$web_history,
 																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
