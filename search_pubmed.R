@@ -65,21 +65,19 @@ retrieve_record_chunk <- function(chunk_start, chunk_size=10000){
 																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
 
 	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
-			"ArticleIds"), simplify=FALSE)
+																	"ArticleIds"), simplify=FALSE)
 
 	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
 	chunk_df$pmid <- rownames(chunk_df)
 
 	write.table(file=paste0("temp_pmid_doi_year_journal_", chunk_start, ".tsv"), x=chunk_df,
-		quote=T, row.names=F,col.names=T, sep='\t')
+													quote=T, row.names=F,col.names=T, sep='\t')
 }
 
 
 
 retrieve_records <- function(){
-	if(!file.exists("r_search.rdata")){
-		search()
-	}
+	search()
 	load("r_search.rdata")
 
 	indices <- seq(1, r_search$count, 10000)
