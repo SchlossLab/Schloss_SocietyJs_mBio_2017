@@ -89,12 +89,10 @@ retrieve_records <- function(){
 	stopCluster(cl)
 
 	temp_files <- paste0("temp_pmid_doi_year_journal_", indices, ".tsv")
-	composite <- lapply(temp_files[1:10], function(x)read.table(file=x, stringsAsFactors=F, header=T))
+	composite <- lapply(temp_files, function(x)read.table(file=x, stringsAsFactors=F, header=T))
 	composite <- do.call(rbind.data.frame, composite)
 
-	stopifnot(nrow(composite)==r_search$count)
-
-	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=T, sep='\t')
+	write.table(file="pmid_doi_year_journal.tsv", composite, row.names=F, quote=T, sep='\t')
 
 	unlink(temp_files)
 	unlink("r_search.rdata")
