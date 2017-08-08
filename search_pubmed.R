@@ -93,6 +93,8 @@ retrieve_records <- function(){
 	composite <- lapply(temp_files[1:10], function(x)read.table(file=x, stringsAsFactors=F, header=T))
 	composite <- do.call(rbind.data.frame, composite)
 
+	stopifnot(nrow(composite)==r_search$count)
+
 	write.table(file="pmid_doi_year_journal.tsv", final_data, row.names=F, quote=T, sep='\t')
 
 	unlink("temp_pmid_year_journal.tsv")
