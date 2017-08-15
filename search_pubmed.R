@@ -29,15 +29,18 @@ library(parallel)
 
 flatten_list_items <- function(x){
 	year <- x$PubDate
-	journal <- x$FullJournalName
+	journal <- x$Source
+	issn <- x$ISSN
+	essn <- x$ESSN
 	id_table <- do.call(rbind.data.frame, x$ArticleIds)
 	doi <- as.character(id_table[which(id_table[,'IdType']=='doi'),'Value'][1])
 
 	if(is.null(doi) || is.na(doi)){ doi <- "NA" }
 	if(is.null(year)){ year <- "NA" }
 	if(is.null(journal)){ journal <- "NA" }
-
-	c(doi=doi, year=year, journal=journal)
+	if(is.null(issn)){ issn <- "NA" }
+	if(is.null(essn)){ essn <- "NA" }
+	c(doi=doi, year=year, journal=journal, issn=issn, essn=essn)
 }
 
 
@@ -65,10 +68,10 @@ retrieve_record_chunk <- function(chunk_start, chunk_size=10000){
 	chunk_summary <- rentrez::entrez_summary(db="pubmed", web_history=r_search$web_history,
 																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
 
-	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "FullJournalName",
-																	"ArticleIds"), simplify=FALSE)
+	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "Source",
+																	"ArticleIds", "ISSN", "ESSN"), simplify=FALSE)
 
-	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)))
+	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)), stringsAsFactors=FALSE)
 	chunk_df$pmid <- rownames(chunk_df)
 
 	write.table(file=paste0("temp_pmid_doi_year_journal_", chunk_start, ".tsv"), x=chunk_df,
