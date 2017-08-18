@@ -84,7 +84,7 @@ retrieve_keyword_records <- function(){
 	keyword_search()
 	load("keyword_search.rdata")
 
-	indices <- sprintf("%07d", seq(1, r_search$count, 10000)
+	indices <- sprintf("%07d", seq(1, r_search$count, 10000))
 
 	cl <- makeCluster(12)
 	clusterExport(cl, "flatten_list_items")
@@ -265,7 +265,7 @@ retrieve_issn_records <- function(){
 	issn_search()
 	load("issn_search.rdata")
 
-	indices <- sprintf("%07d", seq(1, r_search$count, 10000)
+	indices <- sprintf("%07d", seq(1, r_search$count, 10000))
 
 	cl <- makeCluster(12)
 	clusterExport(cl, "flatten_list_items")
