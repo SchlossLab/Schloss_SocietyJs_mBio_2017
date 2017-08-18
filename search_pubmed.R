@@ -223,7 +223,7 @@ issn_search <- function(){
 						"1944-3277",  # STAND GENOMIC SCI
 						"0334-5114",  # SYMBIOSIS
 						"0723-2020",  # SYST APPL MICROBIOL
-						"1877-959X",  # TICKS TICK-BORNE DIS 
+						"1877-959X",  # TICKS TICK-BORNE DIS
 						"0966-842X",  # TRENDS MICROBIOL
 						"1472-9792", "0962-8479",  # TUBERCULOSIS
 						"0378-1135",  # VET MICROBIOL
@@ -279,4 +279,25 @@ retrieve_issn_records <- function(){
 
 	unlink(temp_files)
 	unlink("issn_search.rdata")
+}
+
+
+
+
+merge_search_data <- function(){
+
+	keyword_data <- read.table(file="keyword_pmid_doi_year_journal.tsv", header=T, stringsAsFactors=FALSE)
+	# 3502545 rows
+
+	issn_data <- read.table(file="issn_pmid_doi_year_journal.tsv", header=T, stringsAsFactors=FALSE)
+	#  518830 rows
+
+	pubmed_data <- unique(rbind(issn_data, keyword_data))
+	# 3533643 rows
+
+	pubmed_data$year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$year)
+	pubmed_data[!grepl("^10\\.\\d*\\/", pubmed_data$doi), "doi"] <- NA
+
+	write.table(pubmed_data[,c(6,1,2,3,4,5)], file="pmid_doi_year_journal.tsv", row.names=F)
+
 }
