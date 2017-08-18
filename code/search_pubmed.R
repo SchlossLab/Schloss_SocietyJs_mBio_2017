@@ -24,7 +24,7 @@
 library("rentrez")
 library(XML)
 library(parallel)
-
+library(dplyr)
 
 
 flatten_list_items <- function(x){
@@ -206,9 +206,12 @@ issn_search <- function(){
 						"2045-8827",  # MICROBIOLOGYOPEN
 						"2049-2618",  # MICROBIOME
 						"0374-9096",  # MIKROBIYOL BUL
+						"0270-7306",	# MOL CELL BIOL
 						"0891-4168",  # MOL GENET MICROBIOL+
 						"0950-382X",  # MOL MICROBIOL
 						"2041-1006", "1399-302X",  # MOL ORAL MICROBIOL
+						"2379-5042",	#	MSYSTEMS
+						"2379-5077",	# MSPHERE
 						"1740-1526",  # NAT REV MICROBIOL
 						"1121-7138,  0391-5352",  # NEW MICROBIOL
 						"2049-632X, 0928-8244", "0920-8534",  # PATHOG DIS
@@ -287,6 +290,106 @@ retrieve_issn_records <- function(){
 
 merge_search_data <- function(){
 
+	society_map <- data.frame(
+		matrix(c("1217-8950", "Hungarian Academy of Sciences",
+			"0065-1583", "Polish Society of Cell Biology",
+			"1075-9964", "Anaerobe Society of the Americas and the Japanese Association for Anaerobic Infection Research",
+			"0066-4804", "American Society for Microbiology",
+			"0108-0164", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0108-0180", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0108-0202", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0304-131X", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0304-1328", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0365-4184", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0365-5555", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0365-5571", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"0903-4641", "Scandinavian Societies for Medical Microbiology and Pathology",
+			"1608-3024", "Russian Academy of Sciences",
+			"0099-2240", "American Society for Microbiology",
+			"0003-6919", "American Society for Microbiology",
+			"1517-8382", "Brazilian Society for Microbiology",
+			"1480-3275", "Canadian Society of Microbiologists",
+			"1058-4838", "Infectious Diseases Society of America",
+			"1198-743X", "European Society of Clinical Microbiology and Infectious Diseases",
+			"0893-8512", "American Society for Microbiology",
+			"1556-6811", "American Society for Microbiology",
+			"1071-412X", "American Society for Microbiology",
+			"0213-005X", "Spanish Society of Infectious Diseases and Clinical Microbiology",
+			"1758-2229", "Society for Applied Microbiology",
+			"1462-2912", "Society for Applied Microbiology",
+			"1210-7913", "Czech Medical Association",
+			"0009-0522", "Czech Medical Association",
+			"1535-9778", "American Society for Microbiology",
+			"0932-4739", "Federation of European Protistological Societies",
+			"1431-0651", "International Society for Extremophiles",
+			"0168-6496", "Federation of European Microbiological Societies",
+			"0378-1097", "Federation of European Microbiological Societies",
+			"0168-6445", "Federation of European Microbiological Societies",
+			"1567-1356", "Federation of European Microbiological Societies",
+			"0015-5632", "Institute of Microbiology, Academy of Sciences of the Czech Republic and Czechoslavak Society for Microbiology",
+			"1867-0342", "International Society of Food and Environmental Virology",
+			"1757-4749", "The International Society for Genomic and Evolutionary Microbiology",
+			"0046-8991", "Association of Microbiologists of India",
+			"1753-4259", "International Endotoxin Society",
+			"0968-0519", "International Endotoxin Society",
+			"0924-8579", "International Society of Chemotherapy",
+			"1438-4221", "Deutsche Gesellschaft fur Hygiene und Mikrobiologie",
+			"0934-8840", "Deutsche Gesellschaft fur Hygiene und Mikrobiologie",
+			"1466-5026", "Microbiology Society",
+			"0020-7713", "Microbiology Society",
+			"1618-1905", "Spanish Society for Microbiology",
+			"1751-7362", "International Society for Microbial Ecology",
+			"0021-8820", "Japan Antibiotics Research Association and Society for Actinomycetes Japan",
+			"0305-7453", "British Society for Antimicrobial Chemotherapy",
+			"1364-5072", "Society for Applied Microbiology",
+			"0021-8847", "Society for Applied Microbiology",
+			"0021-9193", "American Society for Microbiology",
+			"0095-1137", "American Society for Microbiology",
+			"1550-7408", "International Society of Protistologists",
+			"0022-1899", "Infectious Diseases Society of America",
+			"0022-2615", "Microbiology Society",
+			"1225-8873", "Microbiological Society of Korea",
+			"1017-7825", "Korean Society for Microbiology and Biotechnology",
+			"1684-1182", "Taiwan Society of Microbiology, the Chinese Society of Immunology, the Infectious Diseases Society of Taiwan and the Taiwan Society of Parasitology",
+			"2008-3645", "Ahvaz Jundishapur University of Medical Sciences",
+			"0266-8254", "Society for Applied Microbiology",
+			"2150-7511", "American Society for Microbiology",
+			"1751-7915", "Society for Applied Microbiology",
+			"1342-6311", "Japanese Society of Microbial Ecology, Japanese Society of Soil Microbiology, Taiwan Society of Microbial Ecology, and Japanese Society of Plant Microbe Interactions",
+			"0385-5600", "Japanese Society for Virology, Japanese Society for Host Defense Research, Japanese Society for Bacteriology",
+			"0021-5139", "Japanese Society for Virology, Japanese Society for Host Defense Research, Japanese Society for Bacteriology",
+			"1092-2172", "American Society for Microbiology",
+			"0146-0749", "American Society for Microbiology",
+			"0005-3678", "American Society for Microbiology",
+			"1350-0872", "Microbiology Society",
+			"0022-1287", "Microbiology Society",
+			"0026-2617", "Russian Academy of Sciences",
+			"0374-9096", "Ankara Microbiology Society",
+			"1121-7138", "Italian Society for Medical Virology",
+			"0391-5352", "Italian Society for Medical Virology",
+			"2049-632X", "Federation of European Microbiological Societies",
+			"0928-8244", "Federation of European Microbiological Societies",
+			"0920-8534", "Federation of European Microbiological Societies",
+			"1733-1331", "Polish Society of Microbiologists",
+			"0137-1320", "Polish Society of Microbiologists",
+			"0001-6195", "Polish Society of Microbiologists",
+			"0567-7815", "Polish Society of Microbiologists",
+			"0567-7823", "Polish Society of Microbiologists",
+			"0079-4252", "Polskie Towarzystwo Mikrobiologow",
+			"0923-2508", "Institut Pasteur",
+			"0769-2609", "Institut Pasteur",
+			"0325-7541", "Asociación Argentina de Microbiología",
+			"0325-1713", "Asociación Argentina de Microbiología",
+			"0214-3429", "Sociedad Española de Quimioterapia",
+			"1944-3277", "Genomic Standards Consortium",
+			"0334-5114", "International Symbiosis Society",
+			"2379-5042", "American Society for Microbiology",
+			"2379-5077", "American Society for Microbiology",
+			"0270-7306", "American Society for Microbiology"
+		), ncol=2, byrow=T), stringsAsFactors=F
+	)
+	colnames(society_map) <- c("issn", "society")
+
 	keyword_data <- read.table(file="data/keyword_pmid_doi_year_journal.tsv", header=T,
 															stringsAsFactors=FALSE)
 	# 3502545 rows
@@ -300,7 +403,13 @@ merge_search_data <- function(){
 
 	pubmed_data$year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$year)
 	pubmed_data[!grepl("^10\\.\\d*\\/", pubmed_data$doi), "doi"] <- NA
+	pubmed_data$society <- NA
 
-	write.table(pubmed_data[,c(6,1,2,3,4,5)], file="data/pmid_doi_year_journal.tsv", row.names=F)
+	x <- left_join(pubmed_data, society_map, by=c('essn'='issn'))
+	y <- left_join(pubmed_data, society_map, by='issn')
+	pubmed_data$society <- ifelse(is.na(x$society.y), y$society.y, x$society.y)
+
+	write.table(pubmed_data[,c(6,1,2,3,4,5,7)], file="data/pmid_doi_year_journal_society.tsv",
+							row.names=F)
 
 }
