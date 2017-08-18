@@ -46,10 +46,10 @@ flatten_list_items <- function(x){
 
 
 keyword_search <- function(){
-	terms <- c("yeast*",  "fung*",  "viral*",  "virus*",  "phage*",  "bacteriophage*",  "archaea*",
-	 					"bacteri*",  "bacteria*",  "bacterio*",  "bacterior*",  "bacterios*",  "bacteriot*",
-						"bacteriov*",  "bacteriu*",  "microbi*",  "microbe*",  "microorganism*",  "pathogen*",
-						"protist*")
+	terms <- c("yeast*", "fung*", "viral*", "virus*", "phage*", "bacteriophage*", "archaea*",
+	 					"bacteri*", "bacteria*", "bacterio*", "bacterior*", "bacterios*", "bacteriot*",
+						"bacteriov*", "bacteriu*", "microbi*", "microbe*", "microorganism*", "pathogen",
+						"pathogens", "pathogenic", "protist*")
 
 	search_string <- paste(paste0(terms, "[All Fields]"), collapse= " OR ")
 	r_search <- entrez_search(db="pubmed", term=search_string, use_history=TRUE)
