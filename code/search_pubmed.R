@@ -74,8 +74,8 @@ retrieve_keyword_record_chunk <- function(chunk_start, chunk_size=10000){
 	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)), stringsAsFactors=FALSE)
 	chunk_df$pmid <- rownames(chunk_df)
 
-	write.table(file=paste0("temp_keyword_pmid_doi_year_journal_", chunk_start, ".tsv"), x=chunk_df,
-													quote=T, row.names=F,col.names=T, sep='\t')
+	write.table(file=paste0("data/temp_keyword_pmid_doi_year_journal_", chunk_start, ".tsv"),
+							x=chunk_df, quote=T, row.names=F,col.names=T, sep='\t')
 }
 
 
@@ -91,11 +91,12 @@ retrieve_keyword_records <- function(){
 	parLapply(cl, indices, retrieve_keyword_record_chunk)
 	stopCluster(cl)
 
-	temp_files <- paste0("temp_keyword_pmid_doi_year_journal_", indices, ".tsv")
+	temp_files <- paste0("data/temp_keyword_pmid_doi_year_journal_", indices, ".tsv")
 	composite <- lapply(temp_files, function(x)read.table(file=x, stringsAsFactors=F, header=T))
 	composite <- do.call(rbind.data.frame, composite)
 
-	write.table(file="keyword_pmid_doi_year_journal.tsv", composite, row.names=F, quote=T, sep='\t')
+	write.table(file="data/keyword_pmid_doi_year_journal.tsv", composite, row.names=F, quote=T,
+							sep='\t')
 
 	unlink(temp_files)
 	unlink("keyword_search.rdata")
@@ -254,8 +255,8 @@ retrieve_issn_record_chunk <- function(chunk_start, chunk_size=10000){
 	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)), stringsAsFactors=FALSE)
 	chunk_df$pmid <- rownames(chunk_df)
 
-	write.table(file=paste0("temp_issn_pmid_doi_year_journal_", chunk_start, ".tsv"), x=chunk_df,
-													quote=T, row.names=F,col.names=T, sep='\t')
+	write.table(file=paste0("data/temp_issn_pmid_doi_year_journal_", chunk_start, ".tsv"),
+							x=chunk_df, quote=T, row.names=F,col.names=T, sep='\t')
 }
 
 
@@ -271,11 +272,11 @@ retrieve_issn_records <- function(){
 	parLapply(cl, indices, retrieve_issn_record_chunk)
 	stopCluster(cl)
 
-	temp_files <- paste0("temp_issn_pmid_doi_year_journal_", indices, ".tsv")
+	temp_files <- paste0("data/temp_issn_pmid_doi_year_journal_", indices, ".tsv")
 	composite <- lapply(temp_files, function(x)read.table(file=x, stringsAsFactors=F, header=T))
 	composite <- do.call(rbind.data.frame, composite)
 
-	write.table(file="issn_pmid_doi_year_journal.tsv", composite, row.names=F, quote=T, sep='\t')
+	write.table(file="data/issn_pmid_doi_year_journal.tsv", composite, row.names=F, quote=T, sep='\t')
 
 	unlink(temp_files)
 	unlink("issn_search.rdata")
@@ -286,10 +287,12 @@ retrieve_issn_records <- function(){
 
 merge_search_data <- function(){
 
-	keyword_data <- read.table(file="keyword_pmid_doi_year_journal.tsv", header=T, stringsAsFactors=FALSE)
+	keyword_data <- read.table(file="data/keyword_pmid_doi_year_journal.tsv", header=T,
+															stringsAsFactors=FALSE)
 	# 3502545 rows
 
-	issn_data <- read.table(file="issn_pmid_doi_year_journal.tsv", header=T, stringsAsFactors=FALSE)
+	issn_data <- read.table(file="data/issn_pmid_doi_year_journal.tsv", header=T,
+													stringsAsFactors=FALSE)
 	#  518830 rows
 
 	pubmed_data <- unique(rbind(issn_data, keyword_data))
@@ -298,6 +301,6 @@ merge_search_data <- function(){
 	pubmed_data$year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$year)
 	pubmed_data[!grepl("^10\\.\\d*\\/", pubmed_data$doi), "doi"] <- NA
 
-	write.table(pubmed_data[,c(6,1,2,3,4,5)], file="pmid_doi_year_journal.tsv", row.names=F)
+	write.table(pubmed_data[,c(6,1,2,3,4,5)], file="data/pmid_doi_year_journal.tsv", row.names=F)
 
 }
