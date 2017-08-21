@@ -164,6 +164,7 @@ issn_search <- function(){
 						"1757-4749",  # GUT PATHOG
 						"1083-4389",  # HELICOBACTER
 						"0046-8991",  # INDIAN J MICROBIOL
+						"0019-9567",	#	INFECT IMMUN
 						"1753-4259", "0968-0519",  # INNATE IMMUN-LONDON
 						"0924-8579",  # INT J ANTIMICROB AG
 						"0168-1605",  # INT J FOOD MICROBIOL
@@ -188,6 +189,7 @@ issn_search <- function(){
 						"0167-7012",  # J MICROBIOL METH
 						"1464-1801",  # J MOL MICROB BIOTECH
 						"2000-2297",  # J ORAL MICROBIOL
+						"0022-538X",	# J VIROL
 						"1477-8920",  # J WATER HEALTH
 						"2008-3645",  # JUNDISHAPUR J MICROB
 						"0266-8254",  # LETT APPL MICROBIOL
@@ -391,7 +393,9 @@ merge_search_data <- function(){
 			"0270-7306", "American Society for Microbiology",
 			"2057-5858", "Microbiology Society",
 			"0022-1317", "Microbiology Society",
-			"2169-8287", "American Society for Microbiology"
+			"2169-8287", "American Society for Microbiology",
+			"0019-9567", "American Society for Microbiology",
+			"0022-538X", "American Society for Microbiology"
 		), ncol=2, byrow=T), stringsAsFactors=F
 	)
 	colnames(society_map) <- c("issn", "society")
