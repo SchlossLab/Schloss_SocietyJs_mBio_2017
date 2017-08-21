@@ -160,6 +160,7 @@ issn_search <- function(){
 						"2235-2988",  # FRONT CELL INFECT MI
 						"1664-302X",  # FRONT MICROBIOL
 						"1746-0913",  # FUTURE MICROBIOL
+						"2169-8287",	# GENOME ANNOUNC
 						"1757-4749",  # GUT PATHOG
 						"1083-4389",  # HELICOBACTER
 						"0046-8991",  # INDIAN J MICROBIOL
@@ -178,6 +179,7 @@ issn_search <- function(){
 						"0095-1137",  # J CLIN MICROBIOL
 						"1550-7408",  # J EUKARYOT MICROBIOL
 						"0022-1260",  # J GEN APPL MICROBIOL
+						"0022-1317",	# J GEN VIROL
 						"0022-1899",  # J INFECT DIS
 						"0022-2615",  # J MED MICROBIOL
 						"1225-8873",  # J MICROBIOL
@@ -195,6 +197,7 @@ issn_search <- function(){
 						"1751-7915",  # MICROB BIOTECHNOL
 						"1076-6294",  # MICROB DRUG RESIST
 						"1432-184X",  # MICROB ECOL
+						"2057-5858",	# MICROB GENOM
 						"0882-4010",  # MICROB PATHOGENESIS
 						"1342-6311",  # MICROBES ENVIRON
 						"1286-4579",  # MICROBES INFECT
@@ -385,7 +388,10 @@ merge_search_data <- function(){
 			"0334-5114", "International Symbiosis Society",
 			"2379-5042", "American Society for Microbiology",
 			"2379-5077", "American Society for Microbiology",
-			"0270-7306", "American Society for Microbiology"
+			"0270-7306", "American Society for Microbiology",
+			"2057-5858", "Microbiology Society",
+			"0022-1317", "Microbiology Society",
+			"2169-8287", "American Society for Microbiology"
 		), ncol=2, byrow=T), stringsAsFactors=F
 	)
 	colnames(society_map) <- c("issn", "society")
