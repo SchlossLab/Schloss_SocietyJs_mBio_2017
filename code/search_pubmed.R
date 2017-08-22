@@ -181,7 +181,7 @@ issn_search <- function(){
 						"1550-7408",  # J EUKARYOT MICROBIOL
 						"0022-1260",  # J GEN APPL MICROBIOL
 						"0022-1317",	# J GEN VIROL
-						"0022-1767", "1047-7381", "1048-3233", # J IMMUNOL
+					#	"0022-1767", "1047-7381", "1048-3233", # J IMMUNOL
 						"0022-1899",  # J INFECT DIS
 						"0022-2615",  # J MED MICROBIOL
 						"1225-8873",  # J MICROBIOL
@@ -396,10 +396,10 @@ merge_search_data <- function(){
 			"0022-1317", "Microbiology Society",
 			"2169-8287", "American Society for Microbiology",
 			"0019-9567", "American Society for Microbiology",
-			"0022-538X", "American Society for Microbiology",
-			"0022-1767", "American Association of Immunologists",
-			"1047-7381", "American Association of Immunologists",
-			"1048-3233", "American Association of Immunologists"
+			"0022-538X", "American Society for Microbiology"#,
+			#"0022-1767", "American Association of Immunologists",
+			#"1047-7381", "American Association of Immunologists",
+			#"1048-3233", "American Association of Immunologists"
 		), ncol=2, byrow=T), stringsAsFactors=F
 	)
 	colnames(society_map) <- c("issn", "society")
