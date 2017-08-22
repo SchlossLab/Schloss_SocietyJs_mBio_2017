@@ -7,7 +7,6 @@ library(dplyr)
 
 
 flatten_list_items <- function(x){
-	print(x)
 	epub_year <- x$EPubDate
 	pub_year <- x$PubDate
 	journal <- x$Source
