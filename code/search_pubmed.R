@@ -1,34 +1,15 @@
-#yeast*	177211
-#fung*	285372
-#viral*	592800
-#virus*	758493
-#phage*	50896
-#bacteriophage*	53672
-#archaea*	21871
-#bacteri*	1285420
-#	bacteria*	1206070
-#	bacterio*	222268
-#		bacterior*	4109
-#		bacterios*	5501
-#		bacteriot*	287
-#		bacteriov*	448
-#bacteriu*	73263
-#microbi*	1381699
-#microbe*	45691
-#microorganism*	87684
-#pathogen*	864424
-#protist*	5886
-
 #install.packages("devtools")
 #devtools::install_github("ropensci/rentrez")
-library("rentrez")
+library(rentrez)
 library(XML)
 library(parallel)
 library(dplyr)
 
 
 flatten_list_items <- function(x){
-	year <- x$PubDate
+	print(x)
+	epub_year <- x$EPubDate
+	pub_year <- x$PubDate
 	journal <- x$Source
 	issn <- x$ISSN
 	essn <- x$ESSN
@@ -36,16 +17,39 @@ flatten_list_items <- function(x){
 	doi <- as.character(id_table[which(id_table[,'IdType']=='doi'),'Value'][1])
 
 	if(is.null(doi) || is.na(doi)){ doi <- "NA" }
-	if(is.null(year)){ year <- "NA" }
+	if(is.null(epub_year)){ epub_year <- "NA" }
+	if(is.null(pub_year)){ pub_year <- "NA" }
 	if(is.null(journal)){ journal <- "NA" }
 	if(is.null(issn)){ issn <- "NA" }
 	if(is.null(essn)){ essn <- "NA" }
-	c(doi=doi, year=year, journal=journal, issn=issn, essn=essn)
+	c(doi=doi, epub_year=epub_year, pub_year=pub_year, journal=journal, issn=issn, essn=essn)
 }
 
 
 
 keyword_search <- function(){
+
+	#yeast*	177211
+	#fung*	285372
+	#viral*	592800
+	#virus*	758493
+	#phage*	50896
+	#bacteriophage*	53672
+	#archaea*	21871
+	#bacteri*	1285420
+	#	bacteria*	1206070
+	#	bacterio*	222268
+	#		bacterior*	4109
+	#		bacterios*	5501
+	#		bacteriot*	287
+	#		bacteriov*	448
+	#bacteriu*	73263
+	#microbi*	1381699
+	#microbe*	45691
+	#microorganism*	87684
+	#pathogen*	864424
+	#protist*	5886
+
 	terms <- c("yeast*", "fung*", "viral*", "virus*", "phage*", "bacteriophage*", "archaea*",
 	 					"bacteri*", "bacteria*", "bacterio*", "bacterior*", "bacterios*", "bacteriot*",
 						"bacteriov*", "bacteriu*", "microbi*", "microbe*", "microorganism*", "pathogen",
@@ -65,10 +69,14 @@ retrieve_keyword_record_chunk <- function(chunk_start, chunk_size=10000){
 
 	Sys.sleep(runif(1) * 60) # slow down searches so they don't clobber server
 
+	#r_search <- entrez_search(db="pubmed", term="26446605[uid] OR 27795424[uid]", use_history=TRUE)
+	#chunk_size <- 10000
+	#chunk_start <- 1
+
 	chunk_summary <- rentrez::entrez_summary(db="pubmed", web_history=r_search$web_history,
 																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
 
-	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "Source",
+	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("EPubDate", "PubDate", "Source",
 																	"ArticleIds", "ISSN", "ESSN"), simplify=FALSE)
 
 	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)), stringsAsFactors=FALSE)
@@ -258,7 +266,7 @@ retrieve_issn_record_chunk <- function(chunk_start, chunk_size=10000){
 	chunk_summary <- rentrez::entrez_summary(db="pubmed", web_history=r_search$web_history,
 																	retmax=chunk_size, retstart=chunk_start, retmode="xml")
 
-	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("PubDate", "Source",
+	chunk_list <- rentrez::extract_from_esummary(chunk_summary, c("EPubDate", "PubDate", "Source",
 																	"ArticleIds", "ISSN", "ESSN"), simplify=FALSE)
 
 	chunk_df <- data.frame(t(sapply(chunk_list, flatten_list_items)), stringsAsFactors=FALSE)
@@ -415,7 +423,8 @@ merge_search_data <- function(){
 	pubmed_data <- unique(rbind(issn_data, keyword_data))
 	# 3533643 rows
 
-	pubmed_data$year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$year)
+	pubmed_data$epub_year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$epub_year)
+	pubmed_data$pub_year <- gsub(".*(\\d\\d\\d\\d).*", "\\1", pubmed_data$pub_year)
 	pubmed_data[!grepl("^10\\.\\d*\\/", pubmed_data$doi), "doi"] <- NA
 	pubmed_data$society <- NA
 
@@ -423,7 +432,7 @@ merge_search_data <- function(){
 	y <- left_join(pubmed_data, society_map, by='issn')
 	pubmed_data$society <- ifelse(is.na(x$society.y), y$society.y, x$society.y)
 
-	write.table(pubmed_data[,c(6,1,2,3,4,5,7)], file="data/pmid_doi_year_journal_society.tsv",
+	write.table(pubmed_data[,c(7,1,2,3,4,5,6,8)], file="data/pmid_doi_year_journal_society.tsv",
 							row.names=F)
 
 }
