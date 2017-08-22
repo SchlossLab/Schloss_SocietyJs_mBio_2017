@@ -445,6 +445,6 @@ merge_search_data <- function(){
 	pubmed_data$publisher <- left_join(data.frame(prefix=doi_prefixes, stringsAsFactors=F),
 																			publishers)$name
 
-	write.table(pubmed_data[,c(7,1,2,3,4,5,6,8,9)], file="data/pmid_doi_year_journal_society.tsv",
+	write.table(pubmed_data[,c(7,1,2,3,4,5,6,8,9)], file="data/pmid_doi_year_journal_society_pub.tsv",
 							row.names=F)
 }
