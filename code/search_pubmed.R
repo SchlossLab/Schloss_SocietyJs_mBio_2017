@@ -4,9 +4,10 @@ library(rentrez)
 library(XML)
 library(parallel)
 library(dplyr)
-
+library(rcrossref)
 
 flatten_list_items <- function(x){
+	print(x)
 	epub_year <- x$EPubDate
 	pub_year <- x$PubDate
 	journal <- x$Source
@@ -300,6 +301,11 @@ retrieve_issn_records <- function(){
 
 
 
+get_publisher <- function(x){
+	rcrossref::cr_journals(issn=x)$data[,c("issn", "publisher")]
+}
+
+
 
 merge_search_data <- function(){
 
@@ -431,7 +437,14 @@ merge_search_data <- function(){
 	y <- left_join(pubmed_data, society_map, by='issn')
 	pubmed_data$society <- ifelse(is.na(x$society.y), y$society.y, x$society.y)
 
-	write.table(pubmed_data[,c(7,1,2,3,4,5,6,8)], file="data/pmid_doi_year_journal_society.tsv",
-							row.names=F)
+	doi_prefixes <- gsub("(10\\.\\d*)/.*", "\\1", pubmed_data$doi)
+	unique_prefixes <- unique(doi_prefixes)
+	publishers <- cr_prefixes(prefixes=unique_prefixes)$data
+	publishers <- publishers[,c("prefix","name")]
+	publishers$prefix <- gsub("http://id.crossref.org/prefix/", "", publishers$prefix)
+	pubmed_data$publisher <- left_join(data.frame(prefix=doi_prefixes, stringsAsFactors=F),
+																			publishers)$name
 
+	write.table(pubmed_data[,c(7,1,2,3,4,5,6,8,9)], file="data/pmid_doi_year_journal_society.tsv",
+							row.names=F)
 }
