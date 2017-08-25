@@ -168,7 +168,7 @@ d <- mega_journal_data %>%
 			xlab("Year") +
 			my_theme +
 			theme(
-				legend.text = element_text(size=7),
+				legend.text = element_text(size=7, face="italic"),
 				legend.key.size = unit(0.55, "line"),
 				legend.key = element_rect(fill = NA, linetype=0),
 				legend.position=c(0.3, 0.7),
