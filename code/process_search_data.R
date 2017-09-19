@@ -130,7 +130,7 @@ b <- all_data %>%
 			geom_line(aes(color=society), size=0.6) +
 			scale_x_continuous(limits=c(1980,2015), breaks=seq(1980,2015,5)) +
 			scale_color_manual(breaks=c("American Society for Microbiology", "Microbiology Society", "Infectious Diseases Society of America", "Federation of European Microbiological Societies",   "Society for Applied Microbiology"),
-														labels=c("ASM", "Microbiology Society", "IDSCA", "FEMS", "SfAM"),
+														labels=c("ASM", "Microbiology Society", "IDSA", "FEMS", "SfAM"),
 														values=cbbPalette) +
 			ylab("Number of Microbiology Papers Published") +
 			xlab("Year") +
